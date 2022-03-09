@@ -1,0 +1,24 @@
+x-common-build: &common-build
+  image: justin0u0/golang-protoc:protoc-3.19.3-golang-1.17
+  working_dir: /src
+  volumes:
+  - .:/src
+
+services:
+  generate:
+    <<: *common-build
+    command:
+    - make
+    - generate
+
+  build:
+    <<: *common-build
+    command:
+    - make
+    - build
+  
+  example:
+    <<: *common-build
+    command:
+    - make
+    - example

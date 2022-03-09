@@ -1,0 +1,11 @@
+syntax = "proto3";
+
+package sarama;
+
+option go_package = "github.com/justin0u0/protoc-gen-grpc-sarama/proto";
+
+import "google/protobuf/descriptor.proto";
+
+extend google.protobuf.ServiceOptions {
+	bool enabled = 1001;
+}

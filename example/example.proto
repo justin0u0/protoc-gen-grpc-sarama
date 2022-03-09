@@ -1,0 +1,34 @@
+syntax = "proto3";
+
+package sarama;
+
+option go_package = "github.com/justin0u0/protoc-gen-grpc-sarama/example";
+
+import "google/protobuf/empty.proto";
+import "proto/sarama.proto";
+
+service EnabledService {
+	option (sarama.enabled) = true;
+
+	rpc HandleHelloEvent(HandleHelloEventRequest) returns (google.protobuf.Empty) {}
+
+	rpc HandleWorldEvent(HandleHelloEventRequest) returns (google.protobuf.Empty) {}
+}
+
+message HandleHelloEventRequest {
+	string hello = 1;
+}
+
+message HandleWorldEventRequest {
+	int32 world = 1;
+}
+
+service DisabledService {
+	option (sarama.enabled) = false;
+
+	rpc HandleExampleEvent(google.protobuf.Empty) returns (google.protobuf.Empty) {}
+}
+
+service UnspecifiedService {
+	rpc HandleExampleEvent(google.protobuf.Empty) returns (google.protobuf.Empty) {}
+}
