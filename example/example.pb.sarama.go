@@ -10,13 +10,13 @@ import (
 	"github.com/justin0u0/protoc-gen-grpc-sarama/pkg/saramakit"
 )
 
-type handler struct {
+type EnabledServiceHandlers struct {
 	*HandleHelloEventHandler
 	*HandleWorldEventHandler
 }
 
-func NewHandler(server EnabledServiceServer) *handler {
-	return &handler{
+func NewEnabledServiceHandlers(server EnabledServiceServer) *EnabledServiceHandlers {
+	return &EnabledServiceHandlers{
 		HandleHelloEventHandler: &HandleHelloEventHandler{
 			server:      server,
 			unmarshaler: &proto.UnmarshalOptions{},
