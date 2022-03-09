@@ -3,6 +3,8 @@ package internal
 type Handlers struct {
 	// Hanlders are handlers(methods) under a single service
 	Handlers []*Handler
+	// Name is the struct name of the collection of handlers
+	Name string
 	// GrpcServerName is the server name that protoc-gen-go-grpc will generate
 	// for the protocol buffer service
 	GrpcServerName string

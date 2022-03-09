@@ -57,6 +57,17 @@ func (gen *Generator) generateFile(plugin *protogen.Plugin, file *protogen.File)
 	g.P("package ", file.GoPackageName)
 	g.P()
 
+	g.P(`
+import (
+	"errors"
+
+	"github.com/Shopify/sarama"
+	"google.golang.org/protobuf/proto"
+	"github.com/justin0u0/protoc-gen-grpc-sarama/pkg/saramakit"
+)
+
+`)
+
 	for _, service := range services {
 		if err := gen.generateHandlers(g, service); err != nil {
 			return err
@@ -69,6 +80,7 @@ func (gen *Generator) generateFile(plugin *protogen.Plugin, file *protogen.File)
 func (gen *Generator) generateHandlers(g *protogen.GeneratedFile, service *protogen.Service) error {
 	handlers := &Handlers{
 		Handlers:       make([]*Handler, 0, len(service.Methods)),
+		Name:           service.GoName + "Handlers",
 		GrpcServerName: service.GoName + "Server",
 	}
 	for _, method := range service.Methods {
@@ -81,22 +93,14 @@ func (gen *Generator) generateHandlers(g *protogen.GeneratedFile, service *proto
 	}
 
 	tmpl, err := template.New("handlers-template").Parse(`
-import (
-	"errors"
-
-	"github.com/Shopify/sarama"
-	"google.golang.org/protobuf/proto"
-	"github.com/justin0u0/protoc-gen-grpc-sarama/pkg/saramakit"
-)
-
-type handler struct {
+type {{ .Name }} struct {
 {{ range .Handlers }}
 	*{{ .Name -}}
 {{ end }}
 }
 
-func NewHandler(server {{.GrpcServerName}}) *handler {
-	return &handler{
+func New{{ .Name }}(server {{.GrpcServerName}}) *{{ .Name }} {
+	return &{{ .Name }}{
 {{- range .Handlers }}
 		{{ .Name }}: &{{ .Name }}{
 			server:      server,
