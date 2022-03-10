@@ -15,15 +15,17 @@ type EnabledServiceHandlers struct {
 	*HandleWorldEventHandler
 }
 
-func NewEnabledServiceHandlers(server EnabledServiceServer) *EnabledServiceHandlers {
+func NewEnabledServiceHandlers(server EnabledServiceServer, logger saramakit.Logger) *EnabledServiceHandlers {
 	return &EnabledServiceHandlers{
 		HandleHelloEventHandler: &HandleHelloEventHandler{
 			server:      server,
 			unmarshaler: &proto.UnmarshalOptions{},
+			logger:      logger.With("HandlerName", "HandleHelloEventHandler"),
 		},
 		HandleWorldEventHandler: &HandleWorldEventHandler{
 			server:      server,
 			unmarshaler: &proto.UnmarshalOptions{},
+			logger:      logger.With("HandlerName", "HandleWorldEventHandler"),
 		},
 	}
 }
@@ -31,6 +33,7 @@ func NewEnabledServiceHandlers(server EnabledServiceServer) *EnabledServiceHandl
 type HandleHelloEventHandler struct {
 	server      EnabledServiceServer
 	unmarshaler *proto.UnmarshalOptions
+	logger      saramakit.Logger
 }
 
 var _ sarama.ConsumerGroupHandler = (*HandleHelloEventHandler)(nil)
@@ -48,7 +51,9 @@ func (h *HandleHelloEventHandler) ConsumeClaim(sess sarama.ConsumerGroupSession,
 		var req HandleHelloEventRequest
 
 		if err := h.unmarshaler.Unmarshal(msg.Value, &req); err != nil {
-			// unretryable failed, log error then skip and consume the message
+			// unretryable failure, skip and consume the message
+			h.logger.Error("failed to unmarshal message", err)
+
 			continue
 		}
 
@@ -56,12 +61,11 @@ func (h *HandleHelloEventHandler) ConsumeClaim(sess sarama.ConsumerGroupSession,
 			var e saramakit.HandlerError
 
 			if ok := errors.As(err, &e); ok && e.Retry {
-				// error returns by HandleHelloEvent and the error is retryable
+				h.logger.Error("failed to handle the message and the error is retryable", err)
 
 				return nil
 			}
-
-			// error returns by HandleHelloEvent and the error is unretryable
+			h.logger.Error("failed to handle the message and the error is unretryable", err)
 		}
 
 		// mark message as completed
@@ -74,6 +78,7 @@ func (h *HandleHelloEventHandler) ConsumeClaim(sess sarama.ConsumerGroupSession,
 type HandleWorldEventHandler struct {
 	server      EnabledServiceServer
 	unmarshaler *proto.UnmarshalOptions
+	logger      saramakit.Logger
 }
 
 var _ sarama.ConsumerGroupHandler = (*HandleWorldEventHandler)(nil)
@@ -91,7 +96,9 @@ func (h *HandleWorldEventHandler) ConsumeClaim(sess sarama.ConsumerGroupSession,
 		var req HandleHelloEventRequest
 
 		if err := h.unmarshaler.Unmarshal(msg.Value, &req); err != nil {
-			// unretryable failed, log error then skip and consume the message
+			// unretryable failure, skip and consume the message
+			h.logger.Error("failed to unmarshal message", err)
+
 			continue
 		}
 
@@ -99,12 +106,11 @@ func (h *HandleWorldEventHandler) ConsumeClaim(sess sarama.ConsumerGroupSession,
 			var e saramakit.HandlerError
 
 			if ok := errors.As(err, &e); ok && e.Retry {
-				// error returns by HandleWorldEvent and the error is retryable
+				h.logger.Error("failed to handle the message and the error is retryable", err)
 
 				return nil
 			}
-
-			// error returns by HandleWorldEvent and the error is unretryable
+			h.logger.Error("failed to handle the message and the error is unretryable", err)
 		}
 
 		// mark message as completed

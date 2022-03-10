@@ -8,11 +8,5 @@ import "google/protobuf/descriptor.proto";
 
 extend google.protobuf.ServiceOptions {
 	bool enabled = 1001;
-}
-
-message Logger {
-	bool enabled = 1;
-	string type = 2;
-	repeated string required_packages = 3;
-	string error_method = 5;
+	bool logger_enabled = 1002;
 }

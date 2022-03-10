@@ -3,6 +3,7 @@ x-common-build: &common-build
   working_dir: /src
   volumes:
   - .:/src
+  - ~/go/pkg/mod/cache:/go/pkg/mod/cache
 
 services:
   generate:

@@ -9,6 +9,7 @@ import "proto/sarama.proto";
 
 service EnabledService {
 	option (sarama.enabled) = true;
+	option (sarama.logger_enabled) = true;
 
 	rpc HandleHelloEvent(HandleHelloEventRequest) returns (google.protobuf.Empty) {}
 

@@ -1,5 +1,12 @@
 package internal
 
+type FileHeader struct {
+	// Package is the go package name
+	Package string
+	// LoggerEnabled is true if logger is enabled
+	LoggerEnabled bool
+}
+
 type Handlers struct {
 	// Hanlders are handlers(methods) under a single service
 	Handlers []*Handler
@@ -8,6 +15,8 @@ type Handlers struct {
 	// GrpcServerName is the server name that protoc-gen-go-grpc will generate
 	// for the protocol buffer service
 	GrpcServerName string
+	// LoggerEnabled is true if logger is enabled
+	LoggerEnabled bool
 }
 
 type Handler struct {
@@ -20,4 +29,6 @@ type Handler struct {
 	Method string
 	// Input is the method input name
 	Input string
+	// LoggerEnabled is true if logger is enabled
+	LoggerEnabled bool
 }
